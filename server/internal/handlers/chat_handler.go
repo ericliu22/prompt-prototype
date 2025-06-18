@@ -16,6 +16,12 @@ type chatRequest struct {
 	Model  string `json:"model,omitempty"`
 }
 
+const (
+	DefaultModel = "gemini-2.5-flash-lite-preview-06-17"
+	GeminiFlash = "gemini-2.5-flash"
+	GeminiLite = "gemini-2.5-flash-lite-preview-06-17"
+)
+
 // outgoing response payload
 type chatResponse struct {
 	Response string `json:"response"`
@@ -46,9 +52,16 @@ func ChatHandler() fiber.Handler {
 
 		engineeredPrompt := prompt.InjectPrompt(req.Prompt)
 
+		var model string = DefaultModel
+		if req.Model != "" {
+			if req.Model == GeminiFlash {
+				model = GeminiFlash
+			}
+		}
+
 		result, promptErr := client.Models.GenerateContent(
 			context.Background(),
-			"models/gemini-2.5-flash",
+			model,
 			genai.Text(engineeredPrompt),
 			nil,
 		)
