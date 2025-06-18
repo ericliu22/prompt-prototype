@@ -11,6 +11,7 @@ import (
 // incoming request payload
 type chatRequest struct {
 	Prompt string `json:"prompt"`
+	Model  string `json:"model,omitempty"`
 }
 
 // outgoing response payload
@@ -42,8 +43,8 @@ func ChatHandler() fiber.Handler {
 
 		result, promptErr := client.Models.GenerateContent(
 			ctx.Context(),
-			"gemini-2.5-flash",
-			genai.Text("Explain how AI works in a few words"),
+			"gemini-2.5-flash-lite",
+			genai.Text(req.Prompt),
 			nil,
 		)
 
