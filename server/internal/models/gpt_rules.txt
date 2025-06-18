@@ -32,3 +32,5 @@ Examples of commonly used formats:
 “Return in a way that can be easily copied and pasted into Notion, with appropriate headers and subheaders.”
 
 6. Provide examples or counterexample responses. The goal is to show the model what “good” looks like.
+
+This is the prompt I want you to improve:

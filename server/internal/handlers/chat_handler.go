@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"os"
+	"prompt-server/internal/core/prompt"
 
 	"github.com/gofiber/fiber/v2"
 	"google.golang.org/genai"
@@ -33,7 +35,8 @@ func ChatHandler() fiber.Handler {
 
 		//MOVE THIS LATER
 		apiKey := os.Getenv("GEMINI_API_KEY")
-		client, clientErr := genai.NewClient(ctx.Context(), &genai.ClientConfig{
+
+		client, clientErr := genai.NewClient(context.Background(), &genai.ClientConfig{
 			APIKey:  apiKey,
 			Backend: genai.BackendGeminiAPI,
 		})
@@ -41,16 +44,18 @@ func ChatHandler() fiber.Handler {
 			log.Fatal(clientErr)
 		}
 
+		engineeredPrompt := prompt.InjectPrompt(req.Prompt)
+
 		result, promptErr := client.Models.GenerateContent(
-			ctx.Context(),
-			"gemini-2.5-flash-lite",
-			genai.Text(req.Prompt),
+			context.Background(),
+			"models/gemini-2.5-flash",
+			genai.Text(engineeredPrompt),
 			nil,
 		)
 
 		if promptErr != nil {
 			// OpenAI returned an error — tell the caller.
-			return fiber.NewError(fiber.StatusBadGateway, clientErr.Error())
+			return fiber.NewError(fiber.StatusBadGateway, promptErr.Error())
 		}
 
 		// 3. Send the assistant’s first choice back as JSON.
